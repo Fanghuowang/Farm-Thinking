@@ -1,172 +1,89 @@
-/*!
-  _   _  ___  ____  ___ ________  _   _   _   _ ___   
- | | | |/ _ \|  _ \|_ _|__  / _ \| \ | | | | | |_ _| 
- | |_| | | | | |_) || |  / / | | |  \| | | | | || | 
- |  _  | |_| |  _ < | | / /| |_| | |\  | | |_| || |
- |_| |_|\___/|_| \_\___/____\___/|_| \_|  \___/|___|
-                                                                                                                                                                                                                                                                                                                                       
-=========================================================
-* Horizon UI - v1.1.0
-=========================================================
+import { Box, Text, Badge, SimpleGrid, Flex, Select, useColorModeValue } from "@chakra-ui/react";
+import React, { useState } from "react";
+import useSensorData from "hooks/useSensorData";
+import SensorTile from "./components/SensorTile";
+import VPDGauge from "./components/VPDGauge";
+import HistoricalChart from "./components/HistoricalChart";
+import EnergySavingsCard from "./components/EnergySavingsCard";
+import AIAgronomistPanel from "./components/AIAgronomistPanel";
+import DecisionLog from "./components/DecisionLog";
+import DemoMode from "./components/DemoMode";
 
-* Product Page: https://www.horizon-ui.com/
-* Copyright 2023 Horizon UI (https://www.horizon-ui.com/)
+const SENSOR_CARDS = [
+  { key: "temperature", label: "Temperature", unit: "C", thresholds: { low: 14, high: 28 } },
+  { key: "humidity", label: "Humidity", unit: "%", thresholds: { low: 40, high: 85 } },
+  { key: "soil_moisture", label: "Soil Moisture", unit: "%", thresholds: { low: 25, high: 75 } },
+  { key: "ph", label: "pH", unit: "", thresholds: { low: 5.0, high: 7.5 } },
+  { key: "reservoir_level", label: "Reservoir", unit: "%", thresholds: { low: 15, high: 100 } },
+  { key: "energy_consumption", label: "Energy", unit: "kW", thresholds: { low: 0.3, high: 4.5 } },
+];
 
-* Designed and Coded by Simmmple
+const PLANT_OPTIONS = ["Lettuce", "Strawberry", "Saffron"];
 
-=========================================================
+export default function Dashboard() {
+  const { sensorData, alerts, connected, history, dismissAlert } = useSensorData();
+  const [plantProfile, setPlantProfile] = useState("Lettuce");
+  const [demoActive, setDemoActive] = useState(false);
+  const panelBg = useColorModeValue("white", "navy.700");
+  const textColor = useColorModeValue("secondaryGray.900", "white");
+  const subtextColor = useColorModeValue("secondaryGray.600", "secondaryGray.600");
 
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
-// Chakra imports
-import {
-  Avatar,
-  Box,
-  Flex,
-  FormLabel,
-  Icon,
-  Select,
-  SimpleGrid,
-  useColorModeValue,
-} from "@chakra-ui/react";
-// Assets
-import Usa from "assets/img/dashboards/usa.png";
-// Custom components
-import MiniCalendar from "components/calendar/MiniCalendar";
-import MiniStatistics from "components/card/MiniStatistics";
-import IconBox from "components/icons/IconBox";
-import React from "react";
-import {
-  MdAddTask,
-  MdAttachMoney,
-  MdBarChart,
-  MdFileCopy,
-} from "react-icons/md";
-import CheckTable from "views/admin/default/components/CheckTable";
-import ComplexTable from "views/admin/default/components/ComplexTable";
-import DailyTraffic from "views/admin/default/components/DailyTraffic";
-import PieCard from "views/admin/default/components/PieCard";
-import Tasks from "views/admin/default/components/Tasks";
-import TotalSpent from "views/admin/default/components/TotalSpent";
-import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
-import {
-  columnsDataCheck,
-  columnsDataComplex,
-} from "views/admin/default/variables/columnsData";
-import tableDataCheck from "views/admin/default/variables/tableDataCheck.json";
-import tableDataComplex from "views/admin/default/variables/tableDataComplex.json";
-
-export default function UserReports() {
-  // Chakra Color Mode
-  const brandColor = useColorModeValue("brand.500", "white");
-  const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-      <SimpleGrid
-        columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }}
-        gap='20px'
-        mb='20px'>
-        <MiniStatistics
-          startContent={
-            <IconBox
-              w='56px'
-              h='56px'
-              bg={boxBg}
-              icon={
-                <Icon w='32px' h='32px' as={MdBarChart} color={brandColor} />
-              }
-            />
-          }
-          name='Earnings'
-          value='$350.4'
-        />
-        <MiniStatistics
-          startContent={
-            <IconBox
-              w='56px'
-              h='56px'
-              bg={boxBg}
-              icon={
-                <Icon w='32px' h='32px' as={MdAttachMoney} color={brandColor} />
-              }
-            />
-          }
-          name='Spend this month'
-          value='$642.39'
-        />
-        <MiniStatistics growth='+23%' name='Sales' value='$574.34' />
-        <MiniStatistics
-          endContent={
-            <Flex me='-16px' mt='10px'>
-              <FormLabel htmlFor='balance'>
-                <Avatar src={Usa} />
-              </FormLabel>
-              <Select
-                id='balance'
-                variant='mini'
-                mt='5px'
-                me='0px'
-                defaultValue='usd'>
-                <option value='usd'>USD</option>
-                <option value='eur'>EUR</option>
-                <option value='gba'>GBA</option>
-              </Select>
-            </Flex>
-          }
-          name='Your balance'
-          value='$1,000'
-        />
-        <MiniStatistics
-          startContent={
-            <IconBox
-              w='56px'
-              h='56px'
-              bg='linear-gradient(90deg, #4481EB 0%, #04BEFE 100%)'
-              icon={<Icon w='28px' h='28px' as={MdAddTask} color='white' />}
-            />
-          }
-          name='New Tasks'
-          value='154'
-        />
-        <MiniStatistics
-          startContent={
-            <IconBox
-              w='56px'
-              h='56px'
-              bg={boxBg}
-              icon={
-                <Icon w='32px' h='32px' as={MdFileCopy} color={brandColor} />
-              }
-            />
-          }
-          name='Total Projects'
-          value='2935'
-        />
-      </SimpleGrid>
+      <Flex align="center" mb="20px" justify="space-between" wrap="wrap" gap="12px">
+        <Flex align="center">
+          <Text fontSize="2xl" fontWeight="bold">
+            Aero-AI Dashboard
+          </Text>
+          <Badge ml="3" colorScheme={connected ? "green" : "red"} fontSize="sm" px="8px" py="2px" borderRadius="full">
+            {connected ? "LIVE" : "DISCONNECTED"}
+          </Badge>
+        </Flex>
+        <Select
+          value={plantProfile}
+          onChange={(e) => setPlantProfile(e.target.value)}
+          w="180px"
+          size="sm"
+          borderRadius="10px"
+          bg={panelBg}
+          color={textColor}
+        >
+          {PLANT_OPTIONS.map((p) => (
+            <option key={p} value={p}>{p}</option>
+          ))}
+        </Select>
+        <DemoMode demoActive={demoActive} onToggle={setDemoActive} />
+      </Flex>
 
-      <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
-        <TotalSpent />
-        <WeeklyRevenue />
-      </SimpleGrid>
-      <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap='20px' mb='20px'>
-        <CheckTable columnsData={columnsDataCheck} tableData={tableDataCheck} />
-        <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px'>
-          <DailyTraffic />
-          <PieCard />
-        </SimpleGrid>
-      </SimpleGrid>
-      <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap='20px' mb='20px'>
-        <ComplexTable
-          columnsData={columnsDataComplex}
-          tableData={tableDataComplex}
-        />
-        <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px'>
-          <Tasks />
-          <MiniCalendar h='100%' minW='100%' selectRange={false} />
-        </SimpleGrid>
-      </SimpleGrid>
+      {sensorData ? (
+        <>
+          <SimpleGrid columns={{ base: 2, md: 3, lg: 3, "2xl": 6 }} gap="20px" mb="20px">
+            {SENSOR_CARDS.map(({ key, label, unit, thresholds }) => (
+              <SensorTile
+                key={key}
+                sensorKey={key}
+                label={label}
+                value={sensorData[key]}
+                unit={unit}
+                thresholds={thresholds}
+              />
+            ))}
+          </SimpleGrid>
+
+          <SimpleGrid columns={{ base: 1, lg: 3 }} gap="20px" mb="20px">
+            <HistoricalChart history={history} />
+            <EnergySavingsCard sensorData={sensorData} />
+            <VPDGauge temperature={sensorData.temperature} humidity={sensorData.humidity} />
+          </SimpleGrid>
+
+          <SimpleGrid columns={{ base: 1, lg: 2 }} gap="20px">
+            <AIAgronomistPanel history={history} plantProfile={plantProfile} />
+            <DecisionLog alerts={alerts} dismissAlert={dismissAlert} />
+          </SimpleGrid>
+        </>
+      ) : (
+        <Text color={subtextColor}>Waiting for sensor data...</Text>
+      )}
     </Box>
   );
 }

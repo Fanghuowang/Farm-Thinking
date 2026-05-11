@@ -1,93 +1,18 @@
-// Chakra imports
 import { Portal, Box, useDisclosure } from '@chakra-ui/react';
 import Footer from 'components/footer/FooterAdmin.js';
-// Layout components
 import Navbar from 'components/navbar/NavbarAdmin.js';
 import Sidebar from 'components/sidebar/Sidebar.js';
 import { SidebarContext } from 'contexts/SidebarContext';
 import React, { useState } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import routes from 'routes.js';
 
-// Custom Chakra theme
 export default function Dashboard(props) {
   const { ...rest } = props;
-  // states and functions
   const [fixed] = useState(false);
   const [toggleSidebar, setToggleSidebar] = useState(false);
-  // functions for changing the states from components
-  const getRoute = () => {
-    return window.location.pathname !== '/admin/full-screen-maps';
-  };
-  const getActiveRoute = (routes) => {
-    let activeRoute = 'Default Brand Text';
-    for (let i = 0; i < routes.length; i++) {
-      if (routes[i].collapse) {
-        let collapseActiveRoute = getActiveRoute(routes[i].items);
-        if (collapseActiveRoute !== activeRoute) {
-          return collapseActiveRoute;
-        }
-      } else if (routes[i].category) {
-        let categoryActiveRoute = getActiveRoute(routes[i].items);
-        if (categoryActiveRoute !== activeRoute) {
-          return categoryActiveRoute;
-        }
-      } else {
-        if (
-          window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
-        ) {
-          return routes[i].name;
-        }
-      }
-    }
-    return activeRoute;
-  };
-  const getActiveNavbar = (routes) => {
-    let activeNavbar = false;
-    for (let i = 0; i < routes.length; i++) {
-      if (routes[i].collapse) {
-        let collapseActiveNavbar = getActiveNavbar(routes[i].items);
-        if (collapseActiveNavbar !== activeNavbar) {
-          return collapseActiveNavbar;
-        }
-      } else if (routes[i].category) {
-        let categoryActiveNavbar = getActiveNavbar(routes[i].items);
-        if (categoryActiveNavbar !== activeNavbar) {
-          return categoryActiveNavbar;
-        }
-      } else {
-        if (
-          window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
-        ) {
-          return routes[i].secondary;
-        }
-      }
-    }
-    return activeNavbar;
-  };
-  const getActiveNavbarText = (routes) => {
-    let activeNavbar = false;
-    for (let i = 0; i < routes.length; i++) {
-      if (routes[i].collapse) {
-        let collapseActiveNavbar = getActiveNavbarText(routes[i].items);
-        if (collapseActiveNavbar !== activeNavbar) {
-          return collapseActiveNavbar;
-        }
-      } else if (routes[i].category) {
-        let categoryActiveNavbar = getActiveNavbarText(routes[i].items);
-        if (categoryActiveNavbar !== activeNavbar) {
-          return categoryActiveNavbar;
-        }
-      } else {
-        if (
-          window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
-        ) {
-          return routes[i].messageNavbar;
-        }
-      }
-    }
-    return activeNavbar;
-  };
+  const { onOpen } = useDisclosure();
+
   const getRoutes = (routes) => {
     return routes.map((route, key) => {
       if (route.layout === '/admin') {
@@ -95,16 +20,23 @@ export default function Dashboard(props) {
           <Route path={`${route.path}`} element={route.component} key={key} />
         );
       }
-      if (route.collapse) {
-        return getRoutes(route.items);
-      } else {
-        return null;
-      }
+      return null;
     });
   };
+
+  const getActiveRoute = (routes) => {
+    for (let i = 0; i < routes.length; i++) {
+      if (
+        window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
+      ) {
+        return routes[i].name;
+      }
+    }
+    return 'Dashboard';
+  };
+
   document.documentElement.dir = 'ltr';
-  const { onOpen } = useDisclosure();
-  document.documentElement.dir = 'ltr';
+
   return (
     <Box>
       <Box>
@@ -133,33 +65,29 @@ export default function Dashboard(props) {
               <Box>
                 <Navbar
                   onOpen={onOpen}
-                  logoText={'Horizon UI Dashboard PRO'}
+                  logoText={'Aero-AI'}
                   brandText={getActiveRoute(routes)}
-                  secondary={getActiveNavbar(routes)}
-                  message={getActiveNavbarText(routes)}
                   fixed={fixed}
                   {...rest}
                 />
               </Box>
             </Portal>
 
-            {getRoute() ? (
-              <Box
-                mx="auto"
-                p={{ base: '20px', md: '30px' }}
-                pe="20px"
-                minH="100vh"
-                pt="50px"
-              >
-                <Routes>
-                  {getRoutes(routes)}
-                  <Route
-                    path="/"
-                    element={<Navigate to="/admin/default" replace />}
-                  />
-                </Routes>
-              </Box>
-            ) : null}
+            <Box
+              mx="auto"
+              p={{ base: '20px', md: '30px' }}
+              pe="20px"
+              minH="100vh"
+              pt="50px"
+            >
+              <Routes>
+                {getRoutes(routes)}
+                <Route
+                  path="/"
+                  element={<Navigate to="/admin/default" replace />}
+                />
+              </Routes>
+            </Box>
             <Box>
               <Footer />
             </Box>
